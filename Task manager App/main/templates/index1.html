@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% include 'header.html' %}
+{% block title %} Home {% endblock %}
+{% block body %}
+        <div class="container">
+            <div class="row">
+                <div class="col md-12">
+                    <div class="jumbotron">
+                        <h2><b>Tasks Manager</b><button type="button" class="btn btn-primary float-right"
+                        data-toggle="modal" data-target="#mymodal">Add new Task</button></h2>
+<!--                        flash message-->
+                        {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                        {% for message in messages%}
+<!--                        styling our message-->
+                        <div class="alert alert-success alert-dismissable" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="close">
+                                <span aria-hidden="true">x</span>
+                            </button>
+                            {{message}}
+                        </div>
+<!--                        end styling-->
+                        {% endfor %}
+                        {% endif %}
+                        {% endwith %}
+<!--                        end flash message block-->
+                         <table class="table table-hover table-dark">
+                             <tr>
+<!--                                 <th>ID</th>-->
+                                 <th>Task Name</th>
+                                 <th><div style='width: 150px;'>Description</div></th>
+                                 <th>Priority</th>
+                                 <th>Due Date</th>
+                                 <th><div style="padding-left:50px">Action</div></th>
+                                 <th>Remove</th>
+                             </tr>
+<!--                             for loop for inserting data into table rows-->
+                             {% for row in employees | sort(attribute='duedate') %}
+                             <tr>
+<!--                                 <td>{{row.id}}</td>-->
+                                 <td>{{row.name}}</td>
+                                 <td><div style='width: 150px;'>{{row.description}}</div></td>
+                                 <td>{{row.priority}}</td>
+                                 <td>{{row.duedate}}</td>
+                                 <td>
+                                     <a href="/update/{{row.id}}" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modaledit{{row.id}}">Edit</a>
+                                     <a href="/delete/{{row.id}}" class="btn btn-success btn-xs">Completed</a>
+
+                                 </td>
+                                 <td><a href="/delete/{{row.id}}"  onclick="return confirm('Are you sure to remove this task?')"><img
+                                         src="./static/images/trash.png" alt=""></a></td>
+                             </tr>
+
+
+
+<!--                             below is the manual data inserted just to get the feel    -->
+<!--                             </tr>-->
+<!--                                                          <tr>-->
+<!--                                 <td>ID</td>-->
+<!--                                 <td>Akshay</td>-->
+<!--                                 <td>aksahy@gamilcom</td>-->
+<!--                                 <td>7789653642265</td>-->
+<!--                                 <td>-->
+<!--                                     <a href="" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modaledit">Edit</a>-->
+<!--                                     <a href="" class="btn btn-danger btn-xs" onclick="return confirm('Are you sire to delete ?')">Delete</a>-->
+<!--                                 </td>-->
+<!--                             </tr>-->
+<!--                             manual data ends here-->
+
+
+                             <!--  start edit modal   -->
+
+                                            <div id="modaledit{{row.id}}" class="modal fade" role="dialog">
+                                               <div class="modal-dialog">
+                                                  <div class="modal-content">
+                                                     <div class="modal-header">
+                                                        <h4 class="modal-title">Update Information</h4>
+                                                     </div>
+                                                     <div class="modal-body">
+                                                        <form action="{{url_for('update')}}" method="POST">
+                                                           <div class="form-group">
+                                                              <label>Name:</label>
+<!--                                                               hidden id to be used in app.py to get this specific object-->
+                                                               <input type="hidden"  name="id" value="{{row.id}}">
+<!--                                                               done-->
+                                                              <input type="text" class="form-control" name="name" required="1" value="{{row.name}}">
+                                                           </div>
+                                                            <div class="form-group">
+                                                              <label>Description:</label>
+                                                              <input type="text" class="form-control" name="description" required="1" value="{{row.description}}">
+                                                           </div>
+                                                            <div class="form-group">
+                                                              <label>Priority:</label><br>
+                                                              <input type="text" class="form-control" name="priority" required="1" value="{{row.priority}}">
+<!--                                                                <label class="radio-inline"><input type="radio"  name="priority" value="low" > Low </label>-->
+<!--                                                                <label class="radio-inline"><input type="radio" name="priority" value="Medium" > Medium </label>-->
+<!--                                                                <label class="radio-inline"><input type="radio" name="priority" value="High" > High </label>-->
+                                                            </div>
+
+                                                            <div class="form-group">
+                                                              <label>Due Date:</label>
+                                                              <input type="Date" class="form-control" name="duedate" required="1" value="{{row.duedate}}">
+                                                           </div>
+                                                           <div class="form-group">
+                                                              <button class="btn btn-primary" type="submit">Save</button>
+                                                           </div>
+                                                        </form>
+                                                     </div>
+                                                     <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                     </div>
+
+                                                  </div>
+                                               </div>
+                                            </div>
+<!--                            end edit modal-->
+                             {% endfor %}
+                         </table>
+                    </div>
+
+                    <!-- Modal Add Employee-->
+
+
+<div id="mymodal" class="modal fade" role="dialog">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h4 class="modal-title">Add New Task</h4>
+         </div>
+         <div class="modal-body">
+            <form action="{{url_for('insert')}}" method="POST">
+               <div class="form-group">
+                  <label>Name:</label>
+                  <input type="text" class="form-control" name="name" required="1">
+               </div>
+                <div class="form-group">
+                  <label>Description:</label>
+                    <textarea row="4" type="text" class="form-control" name="description" required="1"></textarea>
+               </div>
+                <div class="form-group">
+                  <label>Priority:</label><br>
+                    <label class="radio-inline"><input type="radio"  name="priority" value="low" checked> Low </label>
+                    <label class="radio-inline"><input type="radio" name="priority" value="Medium"> Medium </label>
+                    <label class="radio-inline"><input type="radio" name="priority" value="High" > High </label>
+               </div>
+                <div class="form-group">
+                  <label>Due Date:</label>
+                  <input type="date" class="form-control" name="duedate" required="1">
+               </div>
+
+               <div class="form-group">
+                  <button class="btn btn-primary" type="submit">Add Task</button>
+               </div>
+            </form>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+         </div>
+
+      </div>
+   </div>
+</div>
+
+
+
+
+{% endblock %}
+
+
